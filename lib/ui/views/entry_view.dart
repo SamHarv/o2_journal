@@ -128,8 +128,6 @@ class _EntryViewState extends State<EntryView> {
                                 content: _contentController.text,
                               ),
                             );
-                            // TODO: check if updates
-                            // setState(() {});
                             // Navigate back to home view
                             Navigator.pop(context);
                           },
