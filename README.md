@@ -1,16 +1,9 @@
-# o2_journal
+# O2 Journal
 
-A new Flutter project.
+Simple app to save journal entries.
 
-## Getting Started
+Background image is [Webb's First Deep Field](https://webbtelescope.org/news/first-images/gallery) from the James Webb Telescope.
 
-This project is a starting point for a Flutter application.
+## Supported Platforms
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Not yet released.
