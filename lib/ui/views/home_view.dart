@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:o2_journal/ui/widgets/glass_morphism.dart';
 
+import '../widgets/glass_morphism.dart';
 import '../../config/constants.dart';
 import '../../data/database/db_helper.dart';
 import '../../data/models/entry_model.dart';
@@ -9,6 +9,7 @@ import '../../logic/services/date_format_helper.dart';
 import 'entry_view.dart';
 
 class HomeView extends StatefulWidget {
+  /// The main view of the app, displaying a list of journal entries.
   const HomeView({super.key});
 
   @override
@@ -16,11 +17,14 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  // Database helper instance to interact with the SQLite database
   final db = DatabaseHelper.instance;
+  // Number of entries in the database for id generation
   int entryCount = 0;
 
   @override
   Widget build(BuildContext context) {
+    // Hero widget for smooth transitions with background image
     return Hero(
       tag: 'bg',
       child: Scaffold(
@@ -28,19 +32,22 @@ class _HomeViewState extends State<HomeView> {
           constraints: const BoxConstraints.expand(),
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('images/webb.png'),
+              image: AssetImage(webbImage),
               fit: BoxFit.cover,
             ),
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
             child: FutureBuilder(
+              // Fetches all journal entries from the database
               future: db.readAllEntries(),
               builder: (context, AsyncSnapshot snapshot) {
+                // Loading wheel
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(color: Colors.white),
                   );
+                  // Error handling
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
@@ -48,6 +55,7 @@ class _HomeViewState extends State<HomeView> {
                       style: TextStyle(color: Colors.white),
                     ),
                   );
+                  // No entries found
                 } else if (!snapshot.hasData || snapshot.data.isEmpty) {
                   return Center(
                     child: GlassMorphism(
@@ -58,17 +66,23 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   );
                 } else {
+                  // Entries found
+                  // Get the list of entries from the snapshot
                   final entries = snapshot.data;
+                  // Set the entry count for new entry creation
                   entryCount = entries.length;
                   return ListView.builder(
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
+                      // Get the entry at the current index
                       final entry = entries[index];
                       return Padding(
                         padding: const EdgeInsets.only(top: 6),
                         child: InkResponse(
                           borderRadius: BorderRadius.circular(32),
                           onTap: () {
+                            // Navigate to the EntryView with the selected entry
+                            // and update the state after returning
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -99,12 +113,11 @@ class _HomeViewState extends State<HomeView> {
                                       vertical: 0,
                                     ),
                                     child: Text(
+                                      // Format the date using the DateFormatHelper
+                                      // and display it in the center of the entry
+                                      // tile
                                       DateFormatHelper.formatDate(entry.date),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: fontStyle,
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
                                     ),
@@ -124,21 +137,24 @@ class _HomeViewState extends State<HomeView> {
         ),
         floatingActionButton: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.white, width: 1.5),
+            border: Border.all(color: white, width: 1.5),
             borderRadius: BorderRadius.circular(16),
           ),
-
           child: FloatingActionButton(
-            backgroundColor: Colors.black,
+            backgroundColor: black,
             onPressed: () {
               // Create a new entry
               final newEntry = EntryModel(
+                // Generate a new ID for the entry (autoincremented in DB)
                 id: entryCount,
+                // Format date for ordering in the database
                 date: DateFormat.yMd().format(DateTime.now()).toString(),
-                // date: DateFormat.yMd().format(DateTime(2023)).toString(),
+                // Set the content to an empty string
                 content: '',
               );
-
+              // Insert the new entry into the database and navigate to the EntryView
+              // with the new entry
+              // Update the state after returning from the EntryView
               db.createEntry(newEntry).then((_) {
                 Navigator.push(
                   // ignore: use_build_context_synchronously
@@ -149,7 +165,7 @@ class _HomeViewState extends State<HomeView> {
                 ).then((_) => setState(() {}));
               });
             },
-            child: Icon(Icons.add, color: Colors.white),
+            child: Icon(Icons.add, color: white),
           ),
         ),
       ),

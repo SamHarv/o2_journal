@@ -1,4 +1,8 @@
 class DateFormatHelper {
+  /// Converts a date string in the format "MM/DD/YYYY" to "D Month YYYY" for a
+  /// more readable format.
+
+  // Get the month name based on the month number
   static String _getMonthName(String month) {
     switch (month) {
       case '1':
@@ -30,6 +34,7 @@ class DateFormatHelper {
     }
   }
 
+  // Formats a date string from "MM/DD/YYYY" to "D Month YYYY".
   static String formatDate(String date) {
     final month = _getMonthName(date.split('/')[0]);
     final day = date.split('/')[1];

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-import 'package:o2_journal/ui/widgets/glass_morphism.dart';
-
+import '../widgets/glass_morphism.dart';
 import '../../config/constants.dart';
 import '../../data/database/db_helper.dart';
 import '../../data/models/entry_model.dart';
 import '../../logic/services/date_format_helper.dart';
 
 class EntryView extends StatefulWidget {
+  /// The view for a single journal entry, allowing editing and deletion.
+  // [entry] is the journal entry to be displayed and edited.
   final EntryModel entry;
   const EntryView({super.key, required this.entry});
 
@@ -17,24 +17,30 @@ class EntryView extends StatefulWidget {
 }
 
 class _EntryViewState extends State<EntryView> {
+  // Database helper instance to interact with the SQLite database
   final db = DatabaseHelper.instance;
+  // TextEditingController for the content of the journal entry
   late final TextEditingController _contentController;
+  // UndoController for managing undo/redo actions in the text field
   final _contentUndoController = UndoHistoryController();
 
   @override
   void initState() {
+    // Initialize the TextEditingController with the current entry content
     _contentController = TextEditingController(text: widget.entry.content);
     super.initState();
   }
 
   @override
   void dispose() {
+    // Dispose of the TextEditingController when the widget is removed from the widget tree
     _contentController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    // Hero widget for smooth transitions with background image
     return Hero(
       tag: 'bg',
       child: Scaffold(
@@ -42,7 +48,7 @@ class _EntryViewState extends State<EntryView> {
           constraints: const BoxConstraints.expand(),
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('images/webb.png'),
+              image: AssetImage(webbImage),
               fit: BoxFit.cover,
             ),
           ),
@@ -50,6 +56,7 @@ class _EntryViewState extends State<EntryView> {
             children: [
               Column(
                 children: [
+                  // SizedBox to allow space for imaginary app bar
                   SizedBox(height: 90),
                   Expanded(
                     child: SingleChildScrollView(
@@ -62,10 +69,11 @@ class _EntryViewState extends State<EntryView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+                                  // Display the formatted date of the journal entry
                                   DateFormatHelper.formatDate(
                                     widget.entry.date,
                                   ),
-                                  style: fontStyle.copyWith(fontSize: 20),
+                                  style: fontStyle,
                                 ),
                                 const SizedBox(height: 16),
                                 SizedBox(
@@ -75,20 +83,17 @@ class _EntryViewState extends State<EntryView> {
                                         TextCapitalization.sentences,
                                     undoController: _contentUndoController,
                                     controller: _contentController,
-                                    style: fontStyle.copyWith(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
+                                    // Smaller font for content
+                                    style: fontStyle.copyWith(fontSize: 16),
                                     decoration: InputDecoration(
                                       hintText: 'Write your entry here...',
                                       hintStyle: fontStyle.copyWith(
-                                        color: Colors.white.withValues(
-                                          alpha: 0.5,
-                                        ),
+                                        color: white.withValues(alpha: 0.5),
                                         fontSize: 16,
                                       ),
                                       border: InputBorder.none,
                                     ),
+                                    // Multiline text field
                                     maxLines: null,
                                   ),
                                 ),
@@ -101,9 +106,11 @@ class _EntryViewState extends State<EntryView> {
                   ),
                 ],
               ),
+              // Custome App bar with save, undo, redo, and delete buttons
               Column(
                 children: [
-                  SizedBox(height: 30),
+                  // Space for status bar
+                  const SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
@@ -111,11 +118,9 @@ class _EntryViewState extends State<EntryView> {
                       children: [
                         IconButton(
                           onPressed: () {
+                            // Update content, but not date
                             widget.entry.content = _contentController.text;
-                            // widget.entry.date =
-                            //     DateFormat.yMd()
-                            //         .format(DateTime.now())
-                            //         .toString();
+                            // Update in DB
                             db.updateEntry(
                               EntryModel(
                                 id: widget.entry.id,
@@ -123,22 +128,22 @@ class _EntryViewState extends State<EntryView> {
                                 content: _contentController.text,
                               ),
                             );
-                            setState(() {});
+                            // TODO: check if updates
+                            // setState(() {});
+                            // Navigate back to home view
                             Navigator.pop(context);
                           },
-                          icon: Icon(Icons.arrow_back, color: Colors.white),
+                          icon: Icon(Icons.arrow_back, color: white),
                         ),
                         Row(
                           children: [
                             // Save button
                             IconButton(
-                              icon: const Icon(Icons.save, color: Colors.white),
+                              icon: const Icon(Icons.save, color: white),
                               onPressed: () {
+                                // Update content, but not date
                                 widget.entry.content = _contentController.text;
-                                widget.entry.date =
-                                    DateFormat.yMd()
-                                        .format(DateTime.now())
-                                        .toString();
+                                // Update in DB
                                 db.updateEntry(
                                   EntryModel(
                                     id: widget.entry.id,
@@ -146,26 +151,24 @@ class _EntryViewState extends State<EntryView> {
                                     content: _contentController.text,
                                   ),
                                 );
-
+                                // Confirm saved
                                 showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      backgroundColor: Colors.black,
+                                      backgroundColor: black,
                                       title: const Text(
                                         'Entry Saved',
-                                        style: TextStyle(color: Colors.white),
+                                        style: TextStyle(color: white),
                                       ),
                                       actions: [
                                         TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
+                                          // Close dialog
+                                          onPressed:
+                                              () => Navigator.pop(context),
                                           child: const Text(
                                             'OK',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                            ),
+                                            style: TextStyle(color: white),
                                           ),
                                         ),
                                       ],
@@ -176,20 +179,17 @@ class _EntryViewState extends State<EntryView> {
                             ),
                             // Undo typing
                             IconButton(
-                              icon: const Icon(Icons.undo, color: Colors.white),
+                              icon: const Icon(Icons.undo, color: white),
                               onPressed: () => _contentUndoController.undo(),
                             ),
                             // Redo typing
                             IconButton(
-                              icon: const Icon(Icons.redo, color: Colors.white),
+                              icon: const Icon(Icons.redo, color: white),
                               onPressed: () => _contentUndoController.redo(),
                             ),
                             // Delete entry
                             IconButton(
-                              icon: const Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
+                              icon: const Icon(Icons.delete, color: white),
                               onPressed: () {
                                 // Show dialog to confirm deletion
                                 showDialog(
@@ -198,26 +198,25 @@ class _EntryViewState extends State<EntryView> {
                                       (context) => StatefulBuilder(
                                         builder: (context, state) {
                                           return AlertDialog(
-                                            backgroundColor: Colors.black,
+                                            backgroundColor: black,
                                             title: const Text(
                                               'Delete Entry',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
+                                              style: TextStyle(color: white),
                                             ),
                                             content: const Text(
                                               'Are you sure you want to delete this entry?',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                              ),
+                                              style: TextStyle(color: white),
                                             ),
                                             actions: [
+                                              // Delete button
                                               TextButton(
                                                 onPressed: () {
+                                                  // Delete entry from DB
                                                   db.deleteEntry(
                                                     widget.entry.id!,
                                                   );
-
+                                                  // Pop the dialog
+                                                  // Return to home view
                                                   Navigator.pop(context);
                                                   Navigator.pop(context);
                                                 },
@@ -228,14 +227,16 @@ class _EntryViewState extends State<EntryView> {
                                                   ),
                                                 ),
                                               ),
+                                              // Cancel deletion button
                                               TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
+                                                // Close dialog
+                                                onPressed:
+                                                    () =>
+                                                        Navigator.pop(context),
                                                 child: const Text(
                                                   'Cancel',
                                                   style: TextStyle(
-                                                    color: Colors.white,
+                                                    color: white,
                                                   ),
                                                 ),
                                               ),

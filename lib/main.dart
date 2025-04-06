@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'ui/views/home_view.dart';
 
-void main() {
-  runApp(const O2Journal());
-}
+void main() => runApp(const O2Journal());
 
 class O2Journal extends StatelessWidget {
   const O2Journal({super.key});
