@@ -39,6 +39,7 @@ class DateFormatHelper {
     final month = _getMonthName(date.split('/')[0]);
     final day = date.split('/')[1];
     final year = date.split('/')[2];
+    if (day.length == 1) return '0$day $month $year';
     return '$day $month $year';
   }
 }

@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 const white = Colors.white;
 const black = Colors.black;
 
-const webbImage = 'images/webb.png';
+const webbImage = 'images/webb.jpg';
 
 final fontStyle = GoogleFonts.openSans(
   textStyle: const TextStyle(

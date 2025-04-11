@@ -34,7 +34,7 @@ class DatabaseHelper {
     // Create the journal_entries table
     await db.execute('''
     CREATE TABLE journal_entries(
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id INTEGER PRIMARY KEY,
       date TEXT NOT NULL,
       content TEXT NOT NULL
     )
@@ -71,7 +71,7 @@ class DatabaseHelper {
   Future<List<EntryModel>> readAllEntries() async {
     final db = await instance.database;
     // format = YYYY/MM/DD
-    final result = await db.query('journal_entries', orderBy: 'date DESC');
+    final result = await db.query('journal_entries', orderBy: 'id DESC');
     // Map the result to a list of EntryModel objects
     return result.map((map) => EntryModel.fromMap(map)).toList();
   }
